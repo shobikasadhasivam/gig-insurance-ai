@@ -17,38 +17,25 @@ To provide automated, data-driven insurance decisions for gig workers using real
 ---
 
 ## ⚙️ Features
-- 🔐 User login system
-- 🌍 City-based input
-- 🌦 Real-time weather data integration
-- 🌫 Air Quality Index (AQI) analysis
-- 📊 AI-based risk prediction
-- 💰 Dynamic premium calculation
-- 💸 Automatic payout logic
-- 📈 Earnings dashboard
-- 🎨 Clean and modern UI
+- 🔐 User login system  
+- 🌍 City-based input  
+- 🌦 Real-time weather data integration  
+- 🌫 Air Quality Index (AQI) analysis  
+- 📊 AI-based risk prediction  
+- 💰 Dynamic premium calculation  
+- 💸 Automatic payout logic  
+- 📈 Earnings dashboard  
+- 🎨 Clean and modern UI  
 
 ---
 
 ## 🧠 Tech Stack
-- Python
-- Streamlit
-- OpenWeather API
-- SQLite (for user data)
-- Pandas
+- Python  
+- Streamlit  
+- OpenWeather API  
+- SQLite (for user data)  
+- Pandas  
 
 ---
 
 ## 📂 Project Structure
-│
-├── app.py # Main Streamlit application
-├── utils.py # Logic for weather, AQI, risk calculation
-├── database.py # SQLite database handling (users + history)
-├── requirements.txt # Dependencies
-├── images/ # Icons used in UI
-│ ├── rain.png
-│ ├── heat.png
-│ ├── pollution.png
-│ ├── temp.png
-│ ├── weather.png
-│ └── aqi.png
-└── README.md # Project documentation
