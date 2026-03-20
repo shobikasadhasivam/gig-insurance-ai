@@ -39,3 +39,16 @@ To provide automated, data-driven insurance decisions for gig workers using real
 ---
 
 ## 📂 Project Structure
+│
+├── app.py # Main Streamlit application
+├── utils.py # Logic for weather, AQI, risk calculation
+├── database.py # SQLite database handling (users + history)
+├── requirements.txt # Dependencies
+├── images/ # Icons used in UI
+│ ├── rain.png
+│ ├── heat.png
+│ ├── pollution.png
+│ ├── temp.png
+│ ├── weather.png
+│ └── aqi.png
+└── README.md # Project documentation
