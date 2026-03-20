@@ -3,9 +3,14 @@ import os
 from utils import *
 from database import *
 
-st.set_page_config(page_title="Gig Insurance AI", layout="wide")
+# ---------------- PAGE CONFIG ----------------
+st.set_page_config(
+    page_title="AI Gig Insurance",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-# -------- PREMIUM CSS --------
+# ---------------- PREMIUM CSS ----------------
 st.markdown("""
 <style>
 
@@ -43,151 +48,152 @@ st.markdown("""
     text-align:center;
 }
 
-button {
-    border-radius: 10px !important;
-    background-color: #4CAF50 !important;
-    color: white !important;
-    font-weight: bold;
-}
-
 </style>
 """, unsafe_allow_html=True)
 
-# -------- SESSION --------
+# ---------------- SESSION ----------------
 if "user" not in st.session_state:
     st.session_state.user = None
 
-# -------- LOGIN --------
+# ---------------- SIDEBAR ----------------
+menu = st.sidebar.radio("📌 Navigation", ["Home", "Dashboard"])
+
+# ---------------- LOGIN / REGISTER ----------------
 if st.session_state.user is None:
 
-    st.markdown("<div class='title'>🔐 Welcome</div>", unsafe_allow_html=True)
+    st.markdown("<div class='title'>🔐 AI Gig Insurance</div>", unsafe_allow_html=True)
+    st.markdown("<div class='subtitle'>Secure your gig income with AI-powered insurance</div>", unsafe_allow_html=True)
 
-    option = st.radio("", ["Login", "Register"])
+    col1, col2, col3 = st.columns([1,2,1])
 
-    user = st.text_input("Username")
-    pwd = st.text_input("Password", type="password")
+    with col2:
+        option = st.radio("", ["Login", "Register"])
 
-    if option == "Register":
-        if st.button("Register"):
-            register(user, pwd)
-            st.success("Registered successfully!")
+        user = st.text_input("Username")
+        pwd = st.text_input("Password", type="password")
 
-    else:
-        if st.button("Login"):
-            if login(user, pwd):
-                st.session_state.user = user
-                st.success("Login successful!")
-            else:
-                st.error("Invalid credentials")
+        if option == "Register":
+            if st.button("Register"):
+                register(user, pwd)
+                st.success("Registered successfully!")
 
-# -------- MAIN APP --------
+        else:
+            if st.button("Login"):
+                if login(user, pwd):
+                    st.session_state.user = user
+                    st.success("Login successful!")
+                else:
+                    st.error("Invalid credentials")
+
+# ---------------- MAIN APP ----------------
 else:
 
-    st.markdown("<div class='title'>🚀 AI-Powered Insurance</div>", unsafe_allow_html=True)
-    st.markdown("<div class='subtitle'>Protecting gig workers from income loss</div>", unsafe_allow_html=True)
+    if menu == "Home":
 
-    if st.button("Logout"):
-        st.session_state.user = None
+        st.markdown("<div class='title'>🚀 AI Gig Insurance Dashboard</div>", unsafe_allow_html=True)
+        st.markdown("<div class='subtitle'>Real-time risk analysis & automatic payouts</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
+        st.markdown("---")
 
-    col1, col2 = st.columns(2)
+        # -------- INPUT --------
+        col1, col2, col3 = st.columns([2,2,1])
 
-    location = col1.text_input("📍 Enter your City")
-    income = col2.number_input("💰 Daily Income (₹)", min_value=100)
+        location = col1.text_input("📍 City")
+        income = col2.number_input("💰 Daily Income (₹)", min_value=100)
 
-    st.markdown("")
+        if col3.button("🚀 Analyze"):
 
-    if st.button("🚀 Analyze Now"):
+            data = get_weather(location)
 
-        data = get_weather(location)
-
-        if data.get("cod") != 200:
-            st.error("Invalid city")
-        else:
-            temp = data["main"]["temp"]
-            weather = data["weather"][0]["main"]
-            lat = data["coord"]["lat"]
-            lon = data["coord"]["lon"]
-
-            aqi = get_aqi(lat, lon)
-
-            risk = calculate_risk(temp, weather, aqi)
-            premium = calculate_premium(risk)
-            payout, reason = calculate_payout(weather, temp, income, aqi)
-            score = workability_score(weather, temp, aqi)
-
-            # -------- LIVE CONDITIONS --------
-            st.subheader("🌦 Live Conditions")
-
-            c1, c2, c3 = st.columns(3)
-
-            with c1:
-                st.markdown("<div class='glass'>", unsafe_allow_html=True)
-                st.image("images/temp.png", width=50)
-                st.metric("Temperature", f"{temp}°C")
-                st.markdown("</div>", unsafe_allow_html=True)
-
-            with c2:
-                st.markdown("<div class='glass'>", unsafe_allow_html=True)
-                st.image("images/weather.png", width=50)
-                st.metric("Weather", weather)
-                st.markdown("</div>", unsafe_allow_html=True)
-
-            with c3:
-                st.markdown("<div class='glass'>", unsafe_allow_html=True)
-                st.image("images/aqi.png", width=50)
-                st.metric("AQI", aqi)
-                st.markdown("</div>", unsafe_allow_html=True)
-
-            # -------- MAIN ICON --------
-            icon = None
-            if weather.lower() == "rain":
-                icon = "images/rain.png"
-            elif temp > 42:
-                icon = "images/heat.png"
-            elif aqi and aqi >= 4:
-                icon = "images/pollution.png"
-
-            if icon and os.path.exists(icon):
-                col_img = st.columns([1,2,1])[1]
-                with col_img:
-                    st.image(icon, width=140)
-
-            # -------- ANALYSIS --------
-            st.subheader("📊 AI Analysis")
-
-            c1, c2, c3 = st.columns(3)
-
-            c1.markdown(f"<div class='metric-card'><h4>Risk</h4><h2>{risk}</h2></div>", unsafe_allow_html=True)
-            c2.markdown(f"<div class='metric-card'><h4>Premium</h4><h2>₹{premium}</h2></div>", unsafe_allow_html=True)
-            c3.markdown(f"<div class='metric-card'><h4>Workability</h4><h2>{score}/100</h2></div>", unsafe_allow_html=True)
-
-            # -------- PAYOUT --------
-            st.subheader("💸 Insurance Decision")
-
-            if payout > 0:
-                st.success(f"₹{payout} Payout ({reason})")
-                add_history(st.session_state.user, payout)
+            if data.get("cod") != 200:
+                st.error("Invalid city")
             else:
-                st.info("No payout triggered")
+                temp = data["main"]["temp"]
+                weather = data["weather"][0]["main"]
+                lat = data["coord"]["lat"]
+                lon = data["coord"]["lon"]
 
-            # -------- INSIGHT --------
-            st.subheader("🧠 AI Insight")
+                aqi = get_aqi(lat, lon)
 
-            st.markdown("""
-            <div class='glass'>
-            This system uses real-time environmental data, AI risk scoring, and automated triggers to ensure gig workers are financially protected.
-            </div>
-            """, unsafe_allow_html=True)
+                risk = calculate_risk(temp, weather, aqi)
+                premium = calculate_premium(risk)
+                payout, reason = calculate_payout(weather, temp, income, aqi)
+                score = workability_score(weather, temp, aqi)
 
-    # -------- DASHBOARD --------
-    st.markdown("---")
-    st.subheader("📈 Earnings Dashboard")
+                # -------- LIVE CONDITIONS --------
+                st.subheader("🌦 Live Conditions")
 
-    history = get_history(st.session_state.user)
+                c1, c2, c3 = st.columns(3)
 
-    if history:
-        st.line_chart(history)
-    else:
-        st.info("No history yet")
+                with c1:
+                    st.info(f"🌡 Temperature\n\n{temp} °C")
+
+                with c2:
+                    st.info(f"⛅ Weather\n\n{weather}")
+
+                with c3:
+                    st.info(f"🌫 AQI\n\n{aqi}")
+
+                # -------- IMAGE ICON --------
+                icon = None
+                if weather.lower() == "rain":
+                    icon = "images/rain.png"
+                elif temp > 42:
+                    icon = "images/heat.png"
+                elif aqi and aqi >= 4:
+                    icon = "images/pollution.png"
+
+                if icon and os.path.exists(icon):
+                    col_img = st.columns([1,2,1])[1]
+                    with col_img:
+                        st.image(icon, width=140)
+
+                # -------- AI ANALYSIS --------
+                st.subheader("📊 AI Analysis")
+
+                c1, c2, c3 = st.columns(3)
+
+                with c1:
+                    st.metric("Risk Level", risk)
+
+                with c2:
+                    st.metric("Premium", f"₹{premium}")
+
+                with c3:
+                    st.metric("Workability Score", f"{score}/100")
+
+                # -------- PAYOUT --------
+                st.subheader("💸 Insurance Decision")
+
+                if payout > 0:
+                    st.success(f"₹{payout} payout triggered")
+                    st.caption(reason)
+                    add_history(st.session_state.user, payout)
+                else:
+                    st.info("No payout triggered")
+
+                # -------- INSIGHT --------
+                st.subheader("🧠 AI Insight")
+
+                st.markdown("""
+                <div class='glass'>
+                This system uses real-time environmental data, AI risk scoring, and automated triggers to ensure gig workers are financially protected.
+                </div>
+                """, unsafe_allow_html=True)
+
+    # ---------------- DASHBOARD ----------------
+    elif menu == "Dashboard":
+
+        st.subheader("📈 Earnings Dashboard")
+
+        history = get_history(st.session_state.user)
+
+        if history:
+            st.line_chart(history)
+        else:
+            st.info("No history yet")
+
+    # ---------------- LOGOUT ----------------
+    st.sidebar.markdown("---")
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state.user = None
